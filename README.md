@@ -1,0 +1,2 @@
+# Bboard
+Django app
