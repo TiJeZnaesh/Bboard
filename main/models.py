@@ -11,3 +11,26 @@ class AdvUser(AbstractUser):
     class Meta(AbstractUser.Meta):
         # db_table = "Название таблицы внутри базы данных"
         pass
+
+
+class Rubric(models.Model):
+    name = models.CharField(max_length=20, unique=True,
+                            verbose_name='Название')
+    order = models.SmallIntegerField(default=0, db_index=True,
+                                     verbose_name='Порядок')
+    super_rubric = models.ForeignKey('SuperRubric',
+                                     on_delete=models.PROTECT, null=True, blank=True,
+                                     verbose_name='Надрубрика')
+class SuperRubricManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(super_rubric__isnull=True)
+
+class SuperRubric(Rubric):
+    objects = SuperRubricManager()
+    def __str__(self):
+        return self.name
+    class Meta:
+        proxy = True
+        ordering = ('order', 'name')
+        verbose_name = 'Надрубрика'
+        verbose_name_plural = 'Надрубрики'
